@@ -89,7 +89,12 @@
 
       <div id="signupForm">
         <input id="signupEmail" type="email" placeholder="Email" required>
-        <input id="signupPassword" type="password" placeholder="Password" required>
+        <div class="relative">
+          <input id="signupPassword" type="password" placeholder="Password" required>
+           <button type="button" id="toggleSignupPass"
+                  class="absolute right-3 top-3 text-blue-300">👁️</button>
+         </div>
+
         <button id="signupBtn" class="btn w-full mt-2">Sign Up</button>
         <p class="text-sm mt-2">Already have an account?
           <a href="#" id="showLogin" class="text-blue-400 underline">Login here</a>
@@ -98,7 +103,12 @@
 
       <div id="loginForm" class="hidden">
         <input id="loginEmail" type="email" placeholder="Email" required>
+      <div class="relative">
         <input id="loginPassword" type="password" placeholder="Password" required>
+        <button type="button" id="toggleLoginPass"
+         class="absolute right-3 top-3 text-blue-300">👁️</button>
+        </div>
+
         <button id="loginBtn" class="btn w-full mt-2">Login</button>
         <p class="text-sm mt-2">Don’t have an account?
           <a href="#" id="showSignup" class="text-blue-400 underline">Sign up here</a>
@@ -110,14 +120,13 @@
   </div>
 
   <!-- Seller Dashboard -->
-  <div id="sellerPage" class="hidden card w-full max-w-4xl mx-auto mt-10">
-    <div class="flex justify-between items-center mb-4">
-      <h2 class="text-2xl text-blue-300 font-bold">🚀 Seller Dashboard</h2>
-      <div class="flex items-center space-x-2">
-        <button id="addToggle" class="btn">Add Product</button>
-        <button id="logoutBtn" class="btn bg-red-600">Logout</button>
-      </div>
-    </div>
+<div class="mb-4">
+  <h2 class="text-2xl text-blue-300 font-bold mb-3">🚀 Seller Dashboard</h2>
+  <div class="flex flex-col space-y-3 w-full max-w-xs">
+    <button id="addToggle" class="btn w-full">Add Product</button>
+    <button id="logoutBtn" class="btn bg-red-600 w-full">Logout</button>
+  </div>
+</div>
 
     <!-- Add/Edit Form -->
     <div id="productFormContainer" class="hidden mb-6">
@@ -157,6 +166,17 @@
 
   <!-- Firebase Script -->
   <script type="module">
+    // -------- SHOW / HIDE PASSWORD --------
+document.getElementById("toggleSignupPass").onclick = () => {
+  const field = document.getElementById("signupPassword");
+  field.type = field.type === "password" ? "text" : "password";
+};
+
+document.getElementById("toggleLoginPass").onclick = () => {
+  const field = document.getElementById("loginPassword");
+  field.type = field.type === "password" ? "text" : "password";
+};
+
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
       from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
@@ -514,3 +534,4 @@
   </script>
 </body>
 </html>
+
