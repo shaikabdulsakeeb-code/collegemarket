@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>CollegeMarket ⚡</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>CollegeMarket ⚡ — Seller Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
   <style>
@@ -46,9 +46,29 @@
       color: white;
       border-radius: 6px;
     }
+    .small-btn {
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .edit-btn { background: linear-gradient(90deg,#ffd24d,#ff9e00); color:#001; border: none; }
+    .del-btn { background: linear-gradient(90deg,#ff6b6b,#ff3b3b); color: #001; border: none; }
+    .progress {
+      height: 8px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 6px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+    .progress > div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg,#00eaff,#0077ff);
+      transition: width 0.15s;
+    }
   </style>
 </head>
-
 <body class="p-6">
   <!-- Landing Page -->
   <div id="landingPage" class="flex flex-col items-center justify-center min-h-screen text-center">
@@ -60,10 +80,11 @@
     </div>
   </div>
 
-  <!-- Seller Authentication -->
+  <!-- Seller Authentication / Dashboard Container -->
   <div id="authContainer" class="hidden flex flex-col items-center mt-10">
-    <div class="card w-full max-w-md text-center">
+    <div class="card w-full max-w-3xl text-center">
       <h2 class="text-2xl mb-4 text-blue-300">🔐 Seller Login / Signup</h2>
+
       <div id="signupForm">
         <input id="signupEmail" type="email" placeholder="Email" required>
         <input id="signupPassword" type="password" placeholder="Password" required>
@@ -72,6 +93,7 @@
           <a href="#" id="showLogin" class="text-blue-400 underline">Login here</a>
         </p>
       </div>
+
       <div id="loginForm" class="hidden">
         <input id="loginEmail" type="email" placeholder="Email" required>
         <input id="loginPassword" type="password" placeholder="Password" required>
@@ -80,25 +102,51 @@
           <a href="#" id="showSignup" class="text-blue-400 underline">Sign up here</a>
         </p>
       </div>
+
       <button id="backHomeAuth" class="btn w-full mt-4 bg-gray-700 text-blue-300">🏠 Back</button>
     </div>
   </div>
 
-  <!-- Seller Form -->
-  <div id="sellerPage" class="hidden card w-full max-w-2xl mx-auto mt-10">
-    <h2 class="text-2xl mb-4 text-center text-blue-300">🚀 Post Your Product</h2>
-    <form id="sellerForm">
-      <input type="text" id="sellerName" placeholder="Seller Name" required>
-      <input type="text" id="productName" placeholder="Product Name" required>
-      <input type="number" id="price" placeholder="Price (₹)" required>
-      <textarea id="description" placeholder="Description" required></textarea>
-      <input type="email" id="email" placeholder="Email ID" required>
-      <input type="text" id="phone" placeholder="Phone (optional)">
-      <input type="text" id="insta" placeholder="Instagram ID (optional)">
-      <input type="url" id="imageUrl" placeholder="Image URL (optional)">
-      <button type="submit" class="btn w-full">Post Product</button>
-    </form>
-    <button id="logoutBtn" class="btn bg-red-600 w-full mt-4">Logout</button>
+  <!-- Seller Dashboard (replaces previous seller page when logged in) -->
+  <div id="sellerPage" class="hidden card w-full max-w-4xl mx-auto mt-10">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl text-blue-300 font-bold">🚀 Seller Dashboard</h2>
+      <div class="flex items-center space-x-2">
+        <button id="addToggle" class="btn">Add Product</button>
+        <button id="logoutBtn" class="btn bg-red-600">Logout</button>
+      </div>
+    </div>
+
+    <!-- Add/Edit Form (hidden by default, appears when Add Product or Edit clicked) -->
+    <div id="productFormContainer" class="hidden mb-6">
+      <form id="productForm" class="space-y-2">
+        <input type="text" id="sellerName" placeholder="Seller Name (visible to buyers)" required>
+        <input type="text" id="productName" placeholder="Product Name" required>
+        <input type="number" id="price" placeholder="Price (₹)" required>
+        <textarea id="description" placeholder="Description" required></textarea>
+        <input type="email" id="email" placeholder="Contact Email" required>
+        <input type="text" id="phone" placeholder="Phone (optional)">
+        <input type="text" id="insta" placeholder="Instagram ID (optional)">
+
+        <label class="text-blue-300">Choose Image</label>
+        <input type="file" id="imageFile" accept="image/*">
+        <img id="previewImg" class="w-full h-48 object-cover mt-2 rounded hidden" alt="preview">
+
+        <div class="progress hidden" id="imgProgress"><div id="imgBar"></div></div>
+
+        <div class="flex space-x-2">
+          <button id="saveProductBtn" class="btn" type="submit">Save Product</button>
+          <button id="cancelProductBtn" class="btn bg-gray-700" type="button">Cancel</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Seller Products list (auto loads below add area) -->
+    <div id="myProductsContainer">
+      <h3 class="text-lg text-blue-200 mb-3">Your Products</h3>
+      <div id="myProductsList" class="grid sm:grid-cols-1 lg:grid-cols-2 gap-4"></div>
+      <p id="noProductsMsg" class="text-gray-400 text-center mt-4 hidden">No products yet — add your first product above.</p>
+    </div>
   </div>
 
   <!-- Buyer Page -->
@@ -110,11 +158,12 @@
 
   <!-- Firebase + Script -->
   <script type="module">
+    // Firebase modular imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-    import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+    import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
 
-    // Firebase config
+    // ----------------- CONFIG -----------------
     const firebaseConfig = {
       apiKey: "AIzaSyC-PVJ_JeqmXv0qiikanc1BbOXD_60r6ow",
       authDomain: "collegemarket-f4ab7.firebaseapp.com",
@@ -126,15 +175,36 @@
       measurementId: "G-0HB6JMT4J8"
     };
 
+    // ImgBB API key (you provided)
+    const IMGBB_KEY = "7055f8e004ab2cbb7d5b2e3000dffbd7";
+
+    // Initialize
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    // Pages
+    // Page elements
     const landing = document.getElementById("landingPage");
     const authContainer = document.getElementById("authContainer");
     const sellerPage = document.getElementById("sellerPage");
     const buyerPage = document.getElementById("buyerPage");
+
+    // Auth container elements
+    const signupForm = document.getElementById("signupForm");
+    const loginForm = document.getElementById("loginForm");
+
+    // Dashboard elements
+    const addToggle = document.getElementById("addToggle");
+    const productFormContainer = document.getElementById("productFormContainer");
+    const productForm = document.getElementById("productForm");
+    const saveProductBtn = document.getElementById("saveProductBtn");
+    const cancelProductBtn = document.getElementById("cancelProductBtn");
+    const imageFileInput = document.getElementById("imageFile");
+    const previewImg = document.getElementById("previewImg");
+    const imgProgress = document.getElementById("imgProgress");
+    const imgBar = document.getElementById("imgBar");
+    const myProductsList = document.getElementById("myProductsList");
+    const noProductsMsg = document.getElementById("noProductsMsg");
 
     // Buttons
     document.getElementById("goSeller").onclick = () => {
@@ -144,7 +214,7 @@
     document.getElementById("goBuyer").onclick = () => {
       landing.style.display = "none";
       buyerPage.classList.remove("hidden");
-      loadProducts();
+      loadProductsForBuyer();
     };
     document.getElementById("backHomeAuth").onclick =
     document.getElementById("backHomeBuyer").onclick = () => {
@@ -154,9 +224,7 @@
       landing.style.display = "flex";
     };
 
-    // Auth forms
-    const signupForm = document.getElementById("signupForm");
-    const loginForm = document.getElementById("loginForm");
+    // Auth form toggles
     document.getElementById("showLogin").onclick = () => {
       signupForm.classList.add("hidden");
       loginForm.classList.remove("hidden");
@@ -170,6 +238,7 @@
     document.getElementById("signupBtn").onclick = () => {
       const email = document.getElementById("signupEmail").value;
       const password = document.getElementById("signupPassword").value;
+      if (!email || !password) return alert("Enter email & password");
       createUserWithEmailAndPassword(auth, email, password)
         .then(() => alert("Signup successful ✅"))
         .catch((err) => alert("Error: " + err.message));
@@ -179,20 +248,13 @@
     document.getElementById("loginBtn").onclick = () => {
       const email = document.getElementById("loginEmail").value;
       const password = document.getElementById("loginPassword").value;
+      if (!email || !password) return alert("Enter email & password");
       signInWithEmailAndPassword(auth, email, password)
-        .then(() => alert("Login successful ✅"))
+        .then(() => {
+          // success
+        })
         .catch((err) => alert("Error: " + err.message));
     };
-
-    // Auth state
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        authContainer.classList.add("hidden");
-        sellerPage.classList.remove("hidden");
-      } else {
-        sellerPage.classList.add("hidden");
-      }
-    });
 
     // Logout
     document.getElementById("logoutBtn").onclick = () => {
@@ -203,27 +265,277 @@
       });
     };
 
-    // Seller Form
-    document.getElementById("sellerForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const product = {
-        seller: document.getElementById("sellerName").value,
-        name: document.getElementById("productName").value,
-        price: document.getElementById("price").value,
-        desc: document.getElementById("description").value,
-        email: document.getElementById("email").value,
-        phone: document.getElementById("phone").value,
-        insta: document.getElementById("insta").value,
-        image: document.getElementById("imageUrl").value,
-        time: Date.now()
-      };
-      await push(ref(db, "products"), product);
-      alert("✅ Product posted successfully!");
-      e.target.reset();
+    // Auth state — if user logged in show dashboard
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        authContainer.classList.add("hidden");
+        landing.style.display = "none";
+        sellerPage.classList.remove("hidden");
+        // Reset form state
+        hideProductForm();
+        // load seller's products
+        loadSellerProducts(user.uid);
+      } else {
+        // not logged in: hide seller page
+        sellerPage.classList.add("hidden");
+      }
     });
 
-    // Buyer page
-    function loadProducts() {
+    // Toggle Add Product form
+    addToggle.addEventListener("click", () => {
+      if (productFormContainer.classList.contains("hidden")) {
+        showProductForm();
+      } else {
+        hideProductForm();
+      }
+    });
+
+    // Preview image when selected
+    imageFileInput.addEventListener("change", (e) => {
+      const f = e.target.files[0];
+      if (f) {
+        previewImg.src = URL.createObjectURL(f);
+        previewImg.classList.remove("hidden");
+      } else {
+        previewImg.src = "";
+        previewImg.classList.add("hidden");
+      }
+    });
+
+    // Form mode: add or edit
+    let editMode = false;
+    let editKey = null;
+    let existingImageUrl = "";
+
+    function showProductForm(populate = null) {
+      productFormContainer.classList.remove("hidden");
+      if (populate) {
+        editMode = true;
+        editKey = populate.key;
+        document.getElementById("sellerName").value = populate.seller || "";
+        document.getElementById("productName").value = populate.name || "";
+        document.getElementById("price").value = populate.price || "";
+        document.getElementById("description").value = populate.desc || "";
+        document.getElementById("email").value = populate.email || "";
+        document.getElementById("phone").value = populate.phone || "";
+        document.getElementById("insta").value = populate.insta || "";
+        existingImageUrl = populate.image || "";
+        if (existingImageUrl) {
+          previewImg.src = existingImageUrl;
+          previewImg.classList.remove("hidden");
+        }
+        saveProductBtn.textContent = "Update Product";
+      } else {
+        editMode = false;
+        editKey = null;
+        existingImageUrl = "";
+        productForm.reset();
+        previewImg.classList.add("hidden");
+        saveProductBtn.textContent = "Save Product";
+      }
+      // scroll to form
+      productFormContainer.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+
+    function hideProductForm() {
+      productFormContainer.classList.add("hidden");
+      productForm.reset();
+      previewImg.classList.add("hidden");
+      editMode = false;
+      editKey = null;
+      existingImageUrl = "";
+      imgProgress.classList.add("hidden");
+      imgBar.style.width = "0%";
+    }
+
+    cancelProductBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      hideProductForm();
+    });
+
+    // Upload image to ImgBB with a progress UI (approx)
+    async function uploadToImgBB(file, onProgress) {
+      if (!file) return existingImageUrl || ""; // if no new file, keep existing url
+      // We don't get real progress from fetch, so we show a fake progress animation
+      // But we'll still show a quick progress bar
+      imgProgress.classList.remove("hidden");
+      imgBar.style.width = "10%";
+
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, {
+        method: "POST",
+        body: formData
+      });
+
+      // use small animation to indicate done
+      imgBar.style.width = "80%";
+
+      const data = await res.json();
+      if (!data || !data.data || !data.data.url) {
+        imgProgress.classList.add("hidden");
+        imgBar.style.width = "0%";
+        throw new Error("ImgBB upload failed");
+      }
+
+      imgBar.style.width = "100%";
+      setTimeout(() => {
+        imgProgress.classList.add("hidden");
+        imgBar.style.width = "0%";
+      }, 400);
+
+      return data.data.url;
+    }
+
+    // Handle save (add or update)
+    productForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const user = auth.currentUser;
+      if (!user) return alert("You must be logged in to post products.");
+
+      const sellerNameVal = document.getElementById("sellerName").value.trim();
+      const nameVal = document.getElementById("productName").value.trim();
+      const priceVal = document.getElementById("price").value.trim();
+      const descVal = document.getElementById("description").value.trim();
+      const emailVal = document.getElementById("email").value.trim();
+      const phoneVal = document.getElementById("phone").value.trim();
+      const instaVal = document.getElementById("insta").value.trim();
+
+      if (!sellerNameVal || !nameVal || !priceVal || !descVal || !emailVal) {
+        return alert("Please fill all required fields.");
+      }
+
+      // image file (optional in edit)
+      const file = imageFileInput.files[0];
+
+      try {
+        // Upload image (if any new file selected). If edit and no file, keep existingImageUrl.
+        const imageUrl = await uploadToImgBB(file);
+
+        const productObj = {
+          seller: sellerNameVal,
+          sellerId: user.uid,
+          sellerEmail: user.email,
+          name: nameVal,
+          price: priceVal,
+          desc: descVal,
+          email: emailVal,
+          phone: phoneVal,
+          insta: instaVal,
+          image: imageUrl || "",
+          time: Date.now()
+        };
+
+        if (editMode && editKey) {
+          // Update existing product
+          await update(ref(db, "products/" + editKey), productObj);
+          alert("✅ Product updated!");
+        } else {
+          // Create new
+          await push(ref(db, "products"), productObj);
+          alert("✅ Product added!");
+        }
+
+        hideProductForm();
+      } catch (err) {
+        console.error(err);
+        alert("Error uploading/saving product: " + (err.message || err));
+      }
+    });
+
+    // Load seller products (only those by current uid)
+    function loadSellerProducts(uid) {
+      const productsRef = ref(db, "products");
+      onValue(productsRef, (snapshot) => {
+        myProductsList.innerHTML = "";
+        const data = snapshot.val();
+        if (!data) {
+          noProductsMsg.classList.remove("hidden");
+          return;
+        }
+        const items = Object.entries(data).filter(([key, val]) => val && val.sellerId === uid)
+          .map(([key,val]) => ({ key, ...val }))
+          .sort((a,b) => b.time - a.time);
+
+        if (items.length === 0) {
+          noProductsMsg.classList.remove("hidden");
+          return;
+        } else {
+          noProductsMsg.classList.add("hidden");
+        }
+
+        items.forEach(p => {
+          const card = document.createElement("div");
+          card.className = "border border-blue-500 rounded-lg p-4 bg-gray-900 shadow-md hover:shadow-blue-400 transition";
+
+          const imgHtml = p.image ? `<img src="${p.image}" class="w-full h-48 object-cover rounded mb-3">` : "";
+          const phoneHtml = p.phone ? `<p class="text-xs text-gray-400">Phone: ${p.phone}</p>` : "";
+          const instaHtml = p.insta ? `<p class="text-xs text-gray-400">Instagram: @${p.insta}</p>` : "";
+
+          card.innerHTML = `
+            ${imgHtml}
+            <h3 class="text-lg text-blue-300 font-bold">${escapeHtml(p.name)} - ₹${escapeHtml(p.price)}</h3>
+            <p class="text-sm text-gray-300 mb-2">${escapeHtml(p.desc)}</p>
+            <p class="text-xs text-gray-400">Seller: ${escapeHtml(p.seller)}</p>
+            <p class="text-xs text-gray-400">Email: ${escapeHtml(p.email)}</p>
+            ${phoneHtml}
+            ${instaHtml}
+            <div class="flex space-x-2 mt-3">
+              <button class="small-btn edit-btn" data-key="${p.key}">Edit</button>
+              <button class="small-btn del-btn" data-key="${p.key}">Delete</button>
+            </div>
+          `;
+
+          myProductsList.appendChild(card);
+
+          // attach handlers for edit and delete
+          const editBtn = card.querySelector(".edit-btn");
+          const delBtn = card.querySelector(".del-btn");
+
+          editBtn.addEventListener("click", () => {
+            // Pre-fill and show form for editing this product
+            showProductForm({
+              key: p.key,
+              seller: p.seller,
+              name: p.name,
+              price: p.price,
+              desc: p.desc,
+              email: p.email,
+              phone: p.phone,
+              insta: p.insta,
+              image: p.image
+            });
+          });
+
+          delBtn.addEventListener("click", async () => {
+            const ok = confirm("Delete this product? This action cannot be undone.");
+            if (!ok) return;
+            try {
+              await remove(ref(db, "products/" + p.key));
+              alert("Product deleted ✅");
+            } catch (err) {
+              console.error(err);
+              alert("Delete failed: " + (err.message || err));
+            }
+          });
+        });
+      });
+    }
+
+    // Utility: Escape HTML to prevent XSS when injecting text
+    function escapeHtml(text) {
+      if (!text && text !== 0) return "";
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    // Buyer page loader (keeps original behaviour: loads all products)
+    function loadProductsForBuyer() {
       const list = document.getElementById("productList");
       const productsRef = ref(db, "products");
       onValue(productsRef, (snapshot) => {
@@ -239,17 +551,20 @@
           card.className = "border border-blue-500 rounded-lg p-4 bg-gray-900 shadow-md hover:shadow-blue-400 transition";
           card.innerHTML = `
             ${p.image ? `<img src="${p.image}" class="w-full h-48 object-cover rounded mb-3">` : ""}
-            <h3 class="text-lg text-blue-300 font-bold">${p.name} - ₹${p.price}</h3>
-            <p class="text-sm text-gray-300 mb-2">${p.desc}</p>
-            <p class="text-xs text-gray-400">Seller: ${p.seller}</p>
-            <p class="text-xs text-gray-400">Email: ${p.email}</p>
-            ${p.phone ? `<p class="text-xs text-gray-400">Phone: ${p.phone}</p>` : ""}
-            ${p.insta ? `<p class="text-xs text-gray-400">Instagram: @${p.insta}</p>` : ""}
+            <h3 class="text-lg text-blue-300 font-bold">${escapeHtml(p.name)} - ₹${escapeHtml(p.price)}</h3>
+            <p class="text-sm text-gray-300 mb-2">${escapeHtml(p.desc)}</p>
+            <p class="text-xs text-gray-400">Seller: ${escapeHtml(p.seller)}</p>
+            <p class="text-xs text-gray-400">Email: ${escapeHtml(p.email)}</p>
+            ${p.phone ? `<p class="text-xs text-gray-400">Phone: ${escapeHtml(p.phone)}</p>` : ""}
+            ${p.insta ? `<p class="text-xs text-gray-400">Instagram: @${escapeHtml(p.insta)}</p>` : ""}
           `;
           list.appendChild(card);
         });
       });
     }
+
+    // On load: nothing to do, wait for user actions / auth state
+    // (Landing page open by default)
   </script>
 </body>
 </html>
