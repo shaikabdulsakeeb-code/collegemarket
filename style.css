@@ -1,0 +1,102 @@
+body {
+  font-family: 'Orbitron', sans-serif;
+  background: radial-gradient(circle at top, #000428, #004e92);
+  color: #00eaff;
+  margin: 0;
+  min-height: 100vh;
+}
+
+.btn {
+  background: linear-gradient(90deg, #00eaff, #0077ff);
+  color: #001a33;
+  border: none;
+  padding: 12px 25px;
+  font-weight: bold;
+  border-radius: 8px;
+  box-shadow: 0 0 15px #00eaff;
+  transition: 0.3s;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #003b80;
+  color: #00eaff;
+  box-shadow: 0 0 25px #00eaff;
+}
+
+.card {
+  background: rgba(0, 20, 40, 0.85);
+  border: 1px solid #00eaff;
+  border-radius: 12px;
+  box-shadow: 0 0 25px #00eaff80;
+  padding: 20px;
+}
+
+input,
+textarea {
+  width: 100%;
+  margin: 10px 0;
+  padding: 10px;
+  background: #001a33;
+  border: 1px solid #00eaff;
+  color: white;
+  border-radius: 6px;
+}
+
+.small-btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.edit-btn {
+  background: linear-gradient(90deg, #ffd24d, #ff9e00);
+  color: #001;
+  border: none;
+}
+
+.del-btn {
+  background: linear-gradient(90deg, #ff6b6b, #ff3b3b);
+  color: #001;
+  border: none;
+}
+
+.progress {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress > div {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #00eaff, #0077ff);
+  transition: width 0.15s;
+}
+
+.dashboard-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.dashboard-buttons .btn {
+  width: auto;
+  padding-left: 22px;
+  padding-right: 22px;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 16px;
+  }
+
+  .btn {
+    padding: 10px 18px;
+  }
+}
