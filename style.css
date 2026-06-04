@@ -576,21 +576,151 @@ input[type="checkbox"].checkbox-premium:checked::after {
   }
 }
 
+/* ── Mobile: product form as a full-screen scrollable sheet ── */
 @media (max-width: 1023px) {
   #productFormContainer:not(.hidden) {
     position: fixed !important;
     inset: 0 !important;
     z-index: 100 !important;
     display: flex !important;
-    align-items: center !important;
+    align-items: flex-end !important;   /* slide up from bottom */
     justify-content: center !important;
-    padding: 16px !important;
+    padding: 0 !important;
     background-color: rgba(8, 9, 15, 0.85) !important;
-    backdrop-filter: blur(8px) !important;
+    backdrop-filter: blur(10px) !important;
   }
-  #productFormContainer > div {
+
+  /* The inner card: max 92vh, scrollable */
+  #productFormContainer:not(.hidden) > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
     background-color: var(--bg-secondary) !important;
     border: 1px solid var(--border-color) !important;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
+    border-bottom: none !important;
+    border-radius: 20px 20px 0 0 !important;
+    box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.6) !important;
+    padding: 24px 20px 40px !important;
+  }
+
+  /* Drag handle indicator at the top */
+  #productFormContainer:not(.hidden) > div::before {
+    content: '' !important;
+    display: block !important;
+    width: 40px !important;
+    height: 4px !important;
+    background: rgba(255,255,255,0.15) !important;
+    border-radius: 9999px !important;
+    margin: 0 auto 20px !important;
+  }
+
+  /* Hide the desktop-only cancel button since tapping outside closes */
+  #cancelProductBtn {
+    display: flex !important;
+  }
+}
+
+/* ── Seller dashboard: stack to single column on mobile ── */
+@media (max-width: 767px) {
+  #sellerDashboard {
+    flex-direction: column !important;
+  }
+
+  #myProductsList {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Horizontal product item: keep image small on mobile */
+  #myProductsList > div > div:first-child > div:first-child {
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+  /* Stats row: 1 col on very small screens */
+  #sellerPage .grid.grid-cols-1.md\:grid-cols-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Navbar seller email hidden on mobile */
+  #sellerProfileEmail {
+    display: none !important;
+  }
+}
+
+/* ── Buyer marketplace: ensure 1 column on mobile ── */
+@media (max-width: 639px) {
+  #productList {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Category filter pills: horizontal scroll */
+  #categoryFilterContainer {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+  }
+}
+
+/* ── Auth page: full-width on mobile ── */
+@media (max-width: 767px) {
+  #authContainer {
+    padding: 0 !important;
+    align-items: flex-end !important;
+  }
+
+  #authContainer > div {
+    border-radius: 20px 20px 0 0 !important;
+    max-height: 96vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border-bottom: none !important;
+  }
+}
+
+/* ── Product detail modal: bottom sheet on mobile ── */
+@media (max-width: 639px) {
+  #productDetailModal > div {
+    border-radius: 20px 20px 0 0 !important;
+    max-height: 95vh !important;
+  }
+
+  #productDetailModal .left-panel {
+    min-height: 180px !important;
+    max-height: 200px !important;
+  }
+
+  #productDetailModal .right-panel {
+    padding: 16px !important;
+  }
+
+  #productDetailModal h2 {
+    font-size: 18px !important;
+  }
+
+  #productDetailModal #detailPrice {
+    font-size: 22px !important;
+  }
+}
+
+/* ── Buyer filter dropdowns: stack on very small screens ── */
+@media (max-width: 480px) {
+  #sortSelect,
+  #priceFilter,
+  #conditionFilter {
+    width: 100% !important;
+    font-size: 11px !important;
+  }
+
+  /* Landing hero: shrink headline */
+  #landingPage h1 {
+    font-size: 36px !important;
+    line-height: 1.1 !important;
+  }
+
+  /* Custom alert modal: full width on small mobile */
+  #customAlertModal > div {
+    max-width: 100% !important;
+    margin: 0 12px !important;
   }
 }
