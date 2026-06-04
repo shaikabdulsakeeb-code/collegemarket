@@ -1,102 +1,596 @@
-body {
-  font-family: 'Orbitron', sans-serif;
-  background: radial-gradient(circle at top, #000428, #004e92);
-  color: #00eaff;
+/* style.css — Premium Deep Space Minimalism UI/UX Design System */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --bg-primary: #08090f;
+  --bg-secondary: #0f1117;
+  --bg-card: rgba(15, 17, 26, 0.6);
+  --bg-card-hover: rgba(20, 23, 35, 0.8);
+  --border-color: rgba(255, 255, 255, 0.07);
+  --border-hover: rgba(255, 255, 255, 0.14);
+
+  /* Accent: indigo-violet duo — the hero color */
+  --accent-from: #6366f1;
+  --accent-to: #a855f7;
+  --accent-solid: #6366f1;
+  --accent-glow: rgba(99, 102, 241, 0.15);
+
+  /* Highlight: electric mint — used SPARINGLY for prices and verified only */
+  --highlight: #34d399;
+
+  /* Text hierarchy */
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --text-muted: #475569;
+}
+
+* {
+  box-sizing: border-box;
   margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--bg-primary);
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 28px 28px;
+  color: var(--text-primary);
   min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  line-height: 1.7;
+  font-size: 14px;
 }
 
-.btn {
-  background: linear-gradient(90deg, #00eaff, #0077ff);
-  color: #001a33;
+/* Glassmorphism utility */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--border-color);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-panel-glow {
+  box-shadow: 0 0 30px var(--accent-glow);
+  border-color: rgba(168, 85, 247, 0.2);
+}
+
+/* Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Inputs & Forms styling */
+.input-premium {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.input-premium:focus {
+  border-color: var(--accent-solid) !important;
+  box-shadow: 0 0 0 4px var(--accent-glow) !important;
+  outline: none !important;
+}
+
+/* Buttons */
+.btn-premium {
+  background: linear-gradient(135deg, var(--accent-from) 0%, var(--accent-to) 100%);
+  color: #e2e8f0;
   border: none;
-  padding: 12px 25px;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-premium:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px -4px rgba(168, 85, 247, 0.4);
+}
+
+.btn-premium-outline {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-premium-outline:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: var(--border-hover);
+}
+
+/* Redefined variables to silence Blobs */
+.bg-blob {
+  display: none !important;
+}
+
+/* Custom Checkbox */
+input[type="checkbox"].checkbox-premium {
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 8px;
+  border-radius: 6px;
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s;
+}
+
+input[type="checkbox"].checkbox-premium:checked {
+  background-color: var(--accent-solid);
+  border-color: var(--accent-solid);
+}
+
+input[type="checkbox"].checkbox-premium:checked::after {
+  content: '\2713';
+  font-size: 10px;
+  color: #e2e8f0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   font-weight: bold;
-  border-radius: 8px;
-  box-shadow: 0 0 15px #00eaff;
-  transition: 0.3s;
-  cursor: pointer;
 }
 
-.btn:hover {
-  background: #003b80;
-  color: #00eaff;
-  box-shadow: 0 0 25px #00eaff;
+/* Page transitions & Animations */
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
 }
 
-.card {
-  background: rgba(0, 20, 40, 0.85);
-  border: 1px solid #00eaff;
-  border-radius: 12px;
-  box-shadow: 0 0 25px #00eaff80;
-  padding: 20px;
+.animate-slide-up {
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-input,
-textarea {
-  width: 100%;
-  margin: 10px 0;
-  padding: 10px;
-  background: #001a33;
-  border: 1px solid #00eaff;
-  color: white;
-  border-radius: 6px;
+.modal-slide-up {
+  animation: modalUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.small-btn {
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
+.float-card {
+  animation: floatCard 6s ease-in-out infinite alternate;
 }
 
-.edit-btn {
-  background: linear-gradient(90deg, #ffd24d, #ff9e00);
-  color: #001;
-  border: none;
-}
-
-.del-btn {
-  background: linear-gradient(90deg, #ff6b6b, #ff3b3b);
-  color: #001;
-  border: none;
-}
-
-.progress {
-  height: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
-  overflow: hidden;
-  margin-top: 8px;
-}
-
-.progress > div {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #00eaff, #0077ff);
-  transition: width 0.15s;
-}
-
-.dashboard-buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.dashboard-buttons .btn {
-  width: auto;
-  padding-left: 22px;
-  padding-right: 22px;
-}
-
-@media (max-width: 640px) {
-  .card {
-    padding: 16px;
+@keyframes floatCard {
+  from {
+    transform: translateY(0px) rotate(-1deg);
   }
+  to {
+    transform: translateY(-14px) rotate(1deg);
+  }
+}
 
-  .btn {
-    padding: 10px 18px;
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Utility to hide scrollbars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Override Seller dashboard active items */
+#myProductsList > div {
+  position: relative;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 16px !important;
+  padding: 12px !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 16px !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+#myProductsList > div:hover {
+  border-color: var(--border-hover) !important;
+}
+
+#myProductsList > div > div:first-child {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 16px !important;
+  width: 100% !important;
+  flex-grow: 1 !important;
+}
+
+#myProductsList > div > div:first-child > div:first-child {
+  width: 72px !important;
+  height: 72px !important;
+  border-radius: 12px !important;
+  flex-shrink: 0 !important;
+  border-bottom: none !important;
+  overflow: hidden !important;
+}
+
+#myProductsList > div > div:first-child > div:first-child img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+#myProductsList > div > div:first-child > .p-5 {
+  padding: 0 !important;
+  flex-grow: 1 !important;
+}
+
+/* Category & condition badges in seller cards */
+#myProductsList span[class*="bg-indigo-500/10"],
+#myProductsList span[class*="bg-slate-500/10"],
+#myProductsList span[class*="bg-emerald-500/10"] {
+  background: transparent !important;
+  border: 1px solid var(--border-color) !important;
+  padding: 2px 8px !important;
+  font-size: 8px !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Adjust edit/delete buttons layout on seller dashboard */
+#myProductsList > div > div:last-child {
+  border-top: none !important;
+  padding: 0 !important;
+  margin-top: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  flex-shrink: 0 !important;
+}
+
+#myProductsList .edit-btn {
+  background: var(--bg-secondary) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  padding: 4px 12px !important;
+  border-radius: 8px !important;
+  width: auto !important;
+  font-size: 11px !important;
+  transition: all 0.2s !important;
+}
+
+#myProductsList .edit-btn:hover {
+  border-color: var(--border-hover) !important;
+  color: var(--text-primary) !important;
+}
+
+#myProductsList .del-btn {
+  position: absolute !important;
+  top: 8px !important;
+  right: 8px !important;
+  width: 22px !important;
+  height: 22px !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 9999px !important;
+  font-size: 0 !important; /* Hide Delete text */
+  background: rgba(239, 68, 68, 0.06) !important;
+  color: #ef4444 !important;
+  border: 1px solid rgba(239, 68, 68, 0.15) !important;
+  transition: all 0.2s !important;
+}
+
+#myProductsList .del-btn:hover {
+  background: rgba(239, 68, 68, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+#myProductsList .del-btn::before {
+  content: "×" !important;
+  font-size: 14px !important;
+  font-weight: bold !important;
+}
+
+/* Override Buyer Feed Products styling */
+#productList > div {
+  position: relative !important;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 16px !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: space-between !important;
+}
+
+#productList > div:hover {
+  border-color: var(--border-hover) !important;
+  transform: translateY(-3px) !important;
+}
+
+/* Image container */
+#productList > div > div:first-child > div:first-child {
+  position: relative !important;
+  height: 200px !important;
+  overflow: hidden !important;
+  background: #05060a !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  border-radius: 16px 16px 0 0 !important;
+}
+
+/* Image gradient bottom overlay */
+#productList > div > div:first-child > div:first-child::before {
+  content: "" !important;
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 40% !important;
+  background: linear-gradient(to top, var(--bg-card) 0%, transparent 100%) !important;
+  pointer-events: none !important;
+  z-index: 2 !important;
+}
+
+/* Wishlist bookmark star on top-right of image */
+#productList > div > div:first-child > div:first-child::after {
+  content: "☆" !important;
+  position: absolute !important;
+  top: 12px !important;
+  right: 12px !important;
+  width: 28px !important;
+  height: 28px !important;
+  background: rgba(15, 17, 26, 0.8) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: var(--text-secondary) !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease !important;
+  z-index: 5 !important;
+}
+
+#productList > div > div:first-child > div:first-child:hover::after {
+  content: "★" !important;
+  color: var(--accent-solid) !important;
+  border-color: rgba(168, 85, 247, 0.3) !important;
+  box-shadow: 0 0 8px var(--accent-glow) !important;
+}
+
+#productList img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  transition: transform 0.4s ease !important;
+}
+
+#productList > div:hover img {
+  transform: scale(1.02) !important;
+}
+
+#productList .p-5 {
+  padding: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+/* Categories pills row inside product card */
+#productList .p-5 > div:first-child {
+  display: flex !important;
+  gap: 8px !important;
+  flex-wrap: wrap !important;
+  margin-bottom: 2px !important;
+}
+
+/* Category Badge (tiny, ALL CAPS, accent text, no fill) */
+#productList span[class*="bg-indigo-500/10"] {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  color: var(--accent-solid) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.1em !important;
+}
+
+/* Condition Badge (tiny, ALL CAPS, secondary text, bordered) */
+#productList span[class*="bg-emerald-500/10"] {
+  background: transparent !important;
+  border: 1px solid var(--border-color) !important;
+  padding: 2px 8px !important;
+  border-radius: 9999px !important;
+  color: var(--text-secondary) !important;
+  font-size: 9px !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+}
+
+/* Card titles: 15px, weight 600 */
+#productList h3 {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  line-height: 1.4 !important;
+  margin-bottom: 0px !important;
+}
+
+/* Description text in card */
+#productList p.text-slate-400 {
+  font-size: 13px !important;
+  color: var(--text-secondary) !important;
+  line-height: 1.5 !important;
+  height: auto !important;
+  margin-bottom: 8px !important;
+}
+
+/* Card Footer divider & row */
+#productList .border-t {
+  border-top: 1px solid var(--border-color) !important;
+  padding-top: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+/* Seller Name wrapper: hide "Seller: " string, format avatar and verify dot */
+#productList .border-t > span {
+  font-size: 0px !important; /* Hide "Seller: " */
+  color: transparent !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+#productList .border-t strong {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: var(--text-primary) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+/* Seller avatar - initial gradient circle */
+#productList .border-t strong::before {
+  content: "" !important;
+  display: inline-block !important;
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 50% !important;
+  background: linear-gradient(135deg, var(--accent-from), var(--accent-to)) !important;
+  margin-right: 8px !important;
+}
+
+/* Verified dot - electric mint */
+#productList .border-t strong::after {
+  content: "" !important;
+  display: inline-block !important;
+  width: 6px !important;
+  height: 6px !important;
+  border-radius: 50% !important;
+  background-color: var(--highlight) !important;
+  margin-left: 8px !important;
+  box-shadow: 0 0 6px var(--highlight) !important;
+}
+
+/* Price styling in card: 22px, weight 800, mint green */
+#productList .text-cyan-400 {
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  color: var(--highlight) !important;
+}
+
+/* Card bottom button "View Details" fades in on card hover */
+#productList .px-5.pb-5 {
+  padding: 0 20px 20px 20px !important;
+}
+
+#productList button {
+  width: 100% !important;
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  font-size: 0px !important; /* Hide original text */
+  padding: 10px 16px !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  opacity: 0.1 !important; /* Semi-faded state */
+}
+
+#productList > div:hover button {
+  opacity: 1 !important;
+  border-color: var(--accent-solid) !important;
+  box-shadow: 0 0 10px var(--accent-glow) !important;
+}
+
+#productList button::before {
+  content: "View Details →" !important;
+  font-size: 12px !important;
+}
+
+/* Layout for Product Form Container override (38% on desktop) */
+@media (min-width: 1024px) {
+  #productFormContainer:not(.hidden) {
+    position: sticky !important;
+    top: 2rem !important;
+    display: block !important;
+    width: 38% !important;
+    height: auto !important;
+    background: transparent !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    z-index: 10 !important;
+    box-shadow: none !important;
+  }
+  
+  #productFormContainer:not(.hidden) > div {
+    max-height: none !important;
+    overflow-y: visible !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  #productFormContainer:not(.hidden) {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 100 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 16px !important;
+    background-color: rgba(8, 9, 15, 0.85) !important;
+    backdrop-filter: blur(8px) !important;
+  }
+  #productFormContainer > div {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5) !important;
   }
 }

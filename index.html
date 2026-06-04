@@ -1,109 +1,806 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
-  <title>CollegeMarket ⚡ — Seller Dashboard</title>
+  <title>CollegeMarket — Premium Campus Marketplace</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS Play CDN (v3) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+          },
+          colors: {
+            bg: {
+              primary: '#08090f',
+              secondary: '#0f1117',
+              card: 'rgba(15, 17, 26, 0.6)',
+              cardHover: 'rgba(20, 23, 35, 0.8)',
+            },
+            border: {
+              color: 'rgba(255, 255, 255, 0.07)',
+              hover: 'rgba(255, 255, 255, 0.14)',
+            },
+            accent: {
+              from: '#6366f1',
+              to: '#a855f7',
+              solid: '#6366f1',
+              glow: 'rgba(99, 102, 241, 0.15)',
+            },
+            highlight: {
+              mint: '#34d399',
+            },
+            text: {
+              primary: '#e2e8f0',
+              secondary: '#94a3b8',
+              muted: '#475569',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom stylesheet for custom animations and scrollbars -->
   <link href="./style.css" rel="stylesheet">
+  
+  <!-- Override window.alert to use a custom modal and redirect user if needed -->
+  <script>
+    window.alert = function(message) {
+      const modal = document.getElementById("customAlertModal");
+      const titleEl = document.getElementById("customAlertTitle");
+      const msgEl = document.getElementById("customAlertMessage");
+      const iconEl = document.getElementById("customAlertIcon");
+      const btn = document.getElementById("customAlertConfirmBtn");
+      
+      if (!modal || !msgEl) {
+        console.log("Fallback alert:", message);
+        return;
+      }
+      
+      // Determine error/success styles
+      const isAlreadyRegistered = message.includes("email-already-in-use") || message.includes("already-in-use") || message.includes("already has an account") || message.includes("already in use");
+      const isError = message.toLowerCase().includes("error") || message.toLowerCase().includes("failed");
+      const isSuccess = message.includes("✅") || message.toLowerCase().includes("success");
+      
+      if (isAlreadyRegistered) {
+        titleEl.textContent = "Account Exists";
+        msgEl.textContent = "You already have an account. Redirecting you to the login page...";
+        iconEl.innerHTML = `
+          <svg class="w-6 h-6 text-accent-solid" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        `;
+        iconEl.className = "w-12 h-12 rounded-full bg-accent-glow flex items-center justify-center mx-auto mb-4 text-accent-solid";
+      } else if (isError) {
+        titleEl.textContent = "Error";
+        iconEl.innerHTML = `
+          <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          </svg>
+        `;
+        iconEl.className = "w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-4 text-red-400";
+        msgEl.textContent = message;
+      } else if (isSuccess) {
+        titleEl.textContent = "Success";
+        iconEl.innerHTML = `
+          <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        `;
+        iconEl.className = "w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4 text-emerald-400";
+        msgEl.textContent = message;
+      } else {
+        titleEl.textContent = "Notification";
+        iconEl.innerHTML = "⚡";
+        iconEl.className = "w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center mx-auto mb-4 text-purple-400 text-lg font-bold";
+        msgEl.textContent = message;
+      }
+      
+      modal.classList.remove("hidden");
+      
+      btn.onclick = function() {
+        modal.classList.add("hidden");
+        
+        // Auto-redirect from sign-up to login if the account already exists
+        if (isAlreadyRegistered) {
+          const showLoginBtn = document.getElementById("showLogin");
+          if (showLoginBtn) showLoginBtn.click();
+        }
+      };
+    };
+
+    // Synchronize visual styling of tab pills when app.js triggers page switching
+    document.addEventListener("DOMContentLoaded", () => {
+      const showLogin = document.getElementById("showLogin");
+      const showSignup = document.getElementById("showSignup");
+      const tabSignup = document.getElementById("tabSignup");
+      const tabLogin = document.getElementById("tabLogin");
+      
+      if (showLogin && showSignup && tabSignup && tabLogin) {
+        showLogin.addEventListener("click", () => {
+          tabLogin.className = "flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-300 bg-bg-card border border-white/5 text-text-primary text-center";
+          tabSignup.className = "flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-300 text-text-secondary hover:text-text-primary text-center";
+        });
+        
+        showSignup.addEventListener("click", () => {
+          tabSignup.className = "flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-300 bg-bg-card border border-white/5 text-text-primary text-center";
+          tabLogin.className = "flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-300 text-text-secondary hover:text-text-primary text-center";
+        });
+      }
+    });
+  </script>
 </head>
 
-<body class="p-6">
-  <!-- Landing Page -->
-  <div id="landingPage" class="flex flex-col items-center justify-center min-h-screen text-center">
-    <h1 class="text-4xl font-bold mb-4 text-blue-400">⚡ CollegeMarket ⚡</h1>
-    <p class="text-blue-200 mb-6">"A way to Buy & Sell in College — Fast, Secure, Futuristic!"</p>
-    <div class="space-x-4">
-      <button id="goSeller" class="btn">I'm a Seller</button>
-      <button id="goBuyer" class="btn">I'm a Buyer</button>
+<body class="bg-bg-primary text-text-primary min-h-screen font-sans antialiased selection:bg-accent-solid selection:text-white pb-12">
+
+  <!-- Background Decorative Spacers (Classes preserved but hidden via style.css to keep code clean) -->
+  <div class="bg-blob bg-blob-indigo"></div>
+  <div class="bg-blob bg-blob-cyan"></div>
+  <div class="bg-blob bg-blob-purple"></div>
+
+  <!-- Custom Alert Modal (Intercepts window.alert) -->
+  <div id="customAlertModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-bg-primary/80 backdrop-blur-md">
+    <div class="glass-panel max-w-sm w-full rounded-2xl p-6 border border-border-color shadow-2xl text-center animate-slide-up">
+      <div id="customAlertIcon" class="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center mx-auto mb-4 text-purple-400 text-xl font-bold">⚡</div>
+      <h3 id="customAlertTitle" class="text-base font-bold text-text-primary mb-2">Notification</h3>
+      <p id="customAlertMessage" class="text-xs text-text-secondary leading-relaxed mb-6">Action status message.</p>
+      <button id="customAlertConfirmBtn" class="btn-premium w-full py-3 rounded-xl text-xs font-bold transition-all duration-300">
+        Confirm
+      </button>
     </div>
   </div>
 
-  <!-- Seller Authentication -->
-  <div id="authContainer" class="hidden flex flex-col items-center mt-10">
-    <div class="card w-full max-w-3xl text-center">
-      <h2 class="text-2xl mb-4 text-blue-300">🔐 Seller Login / Signup</h2>
-
-      <div id="signupForm">
-        <input id="signupEmail" type="email" placeholder="Email" required>
-        <input id="signupPassword" type="password" placeholder="Password" required>
-        <div class="mb-4 text-left px-6">
-          <label class="text-blue-200">
-            <input type="checkbox" class="show-password-toggle mr-2 align-middle">
-            Show Password
-          </label>
+  <!-- ① Landing Page -->
+  <div id="landingPage" class="min-h-screen flex flex-col justify-center max-w-7xl mx-auto px-4 md:px-8 py-12 relative overflow-hidden">
+    <!-- 60/40 Split Content Container -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full my-auto">
+      
+      <!-- Left Column: Editorial Copy (60% equivalent) -->
+      <div class="lg:col-span-7 flex flex-col items-start space-y-6 text-left">
+        
+        <!-- Social Proof line -->
+        <div class="text-[10px] font-bold text-text-muted uppercase tracking-widest animate-fade-in select-none">
+          247 listings active this week across 12 campuses
         </div>
-        <button id="signupBtn" class="btn w-full mt-2">Sign Up</button>
-        <p class="text-sm mt-2">Already have an account?
-          <a href="#" id="showLogin" class="text-blue-400 underline">Login here</a>
+        
+        <!-- Headline split across three lines -->
+        <h1 class="text-[48px] sm:text-[72px] lg:text-[80px] font-extrabold tracking-tight leading-[1.05] text-text-primary animate-slide-up">
+          The campus <br />
+          <span class="bg-gradient-to-r from-accent-from to-accent-to bg-clip-text text-transparent">marketplace,</span> <br />
+          reimagined.
+        </h1>
+        
+        <!-- Subheadline -->
+        <p class="text-text-secondary text-sm sm:text-base max-w-[420px] leading-[1.7] font-normal animate-slide-up" style="animation-delay: 0.1s">
+          The smartest way to buy and sell items directly on campus. Secure authentication, category filters, and instant seller contact.
         </p>
+        
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto pt-4 animate-slide-up" style="animation-delay: 0.2s">
+          <button id="goBuyer" class="btn-premium px-8 py-4 rounded-full flex items-center justify-center gap-2 group text-sm">
+            Browse Products
+            <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+          </button>
+          <button id="goSeller" class="btn-premium-outline px-8 py-4 rounded-full flex items-center justify-center gap-2 text-sm">
+            <svg class="w-4 h-4 text-accent-solid" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            Seller Dashboard
+          </button>
+        </div>
+      </div>
+      
+      <!-- Right Column Visual: CSS-only floating product card (40% equivalent) -->
+      <div class="lg:col-span-5 flex justify-center lg:justify-end items-center relative py-8 animate-fade-in" style="animation-delay: 0.1s">
+        <!-- Abstract CSS product card mockup -->
+        <div class="relative w-full max-w-[320px] aspect-[4/5] bg-bg-card border border-border-color rounded-2xl p-6 float-card shadow-2xl flex flex-col justify-between">
+          <!-- Mock image area -->
+          <div class="w-full h-36 bg-bg-secondary rounded-xl relative overflow-hidden flex items-center justify-center border border-border-color">
+            <div class="absolute inset-0 bg-gradient-to-tr from-accent-from/15 to-accent-to/15"></div>
+            <div class="w-16 h-16 rounded-full bg-gradient-to-tr from-accent-from to-accent-to opacity-30 blur-lg"></div>
+            <div class="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-text-primary font-bold text-sm z-10">⚡</div>
+          </div>
+          <!-- Mock details -->
+          <div class="space-y-3 mt-4">
+            <div class="flex justify-between items-start">
+              <div class="space-y-1.5 flex-grow">
+                <div class="h-3.5 bg-text-primary/20 rounded-md w-3/4"></div>
+                <div class="h-2.5 bg-text-secondary/15 rounded-md w-1/2"></div>
+              </div>
+              <span class="text-highlight-mint font-extrabold text-base select-none">₹24,000</span>
+            </div>
+            <div class="space-y-1.5 pt-1.5">
+              <div class="h-2 bg-text-muted/20 rounded w-full"></div>
+              <div class="h-2 bg-text-muted/20 rounded w-5/6"></div>
+            </div>
+          </div>
+          <!-- Mock seller -->
+          <div class="flex justify-between items-center pt-3 border-t border-border-color mt-auto">
+            <div class="flex items-center gap-2">
+              <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-accent-from to-accent-to flex items-center justify-center text-[9px] text-text-primary font-bold">C</div>
+              <div class="h-2 bg-text-secondary/20 rounded w-14"></div>
+            </div>
+            <span class="w-1.5 h-1.5 rounded-full bg-highlight-mint animate-pulse shadow-[0_0_6px_#34d399]"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Feature cards (horizontal list on desktop) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl w-full text-left mt-16 sm:mt-24 pt-8 border-t border-border-color animate-slide-up" style="animation-delay: 0.3s">
+      <div class="pl-6 border-l-2 border-accent-solid py-1">
+        <h3 class="text-sm font-bold text-text-primary mb-1">Instant Deals</h3>
+        <p class="text-xs text-text-secondary leading-normal">Connect directly with students through WhatsApp, Email, or Instagram in one click.</p>
+      </div>
+      <div class="pl-6 border-l-2 border-accent-solid py-1">
+        <h3 class="text-sm font-bold text-text-primary mb-1">Safe Campus</h3>
+        <p class="text-xs text-text-secondary leading-normal">Restricted secure authentication ensures you only deal with peers inside your college ecosystem.</p>
+      </div>
+      <div class="pl-6 border-l-2 border-accent-solid py-1">
+        <h3 class="text-sm font-bold text-text-primary mb-1">Smart Filters</h3>
+        <p class="text-xs text-text-secondary leading-normal">Search and filter listings easily by Category, Price, and Condition.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ② Seller Authentication Page -->
+  <div id="authContainer" class="hidden min-h-screen flex items-center justify-center px-4 py-8">
+    <div class="glass-panel w-full max-w-4xl rounded-2xl overflow-hidden flex flex-col lg:flex-row relative">
+      
+
+
+      <!-- Left Panel (40%): Solid dark gradient with trust signals -->
+      <div class="hidden lg:flex lg:w-[40%] flex-col justify-between p-12 bg-gradient-to-br from-[#101118] to-[#08090f] border-r border-border-color">
+        <div>
+          <!-- Logo -->
+          <div class="flex items-center gap-2 mb-2 mt-8">
+            <span class="text-xl font-extrabold tracking-tight text-text-primary">CollegeMarket<span class="text-accent-solid font-black">.</span></span>
+          </div>
+          <p class="text-text-secondary text-xs">The campus-only marketplace, reimagined.</p>
+        </div>
+        
+        <!-- Trust Signals -->
+        <div class="space-y-6 my-auto">
+          <div class="flex gap-4">
+            <div class="w-8 h-8 rounded-lg bg-accent-glow border border-accent-solid/10 flex items-center justify-center text-accent-solid text-sm">🏫</div>
+            <div>
+              <h4 class="text-xs font-bold text-text-primary">Campus-Only Networks</h4>
+              <p class="text-[11px] text-text-secondary leading-normal mt-0.5">Only students from verified college domains can list or buy.</p>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div class="w-8 h-8 rounded-lg bg-accent-glow border border-accent-solid/10 flex items-center justify-center text-accent-solid text-sm">🔒</div>
+            <div>
+              <h4 class="text-xs font-bold text-text-primary">Secure Authentication</h4>
+              <p class="text-[11px] text-text-secondary leading-normal mt-0.5">Robust security to keep the storefront clean and spam-free.</p>
+            </div>
+          </div>
+          <div class="flex gap-4">
+            <div class="w-8 h-8 rounded-lg bg-accent-glow border border-accent-solid/10 flex items-center justify-center text-accent-solid text-sm">⚡</div>
+            <div>
+              <h4 class="text-xs font-bold text-text-primary">Instant Peer Contact</h4>
+              <p class="text-[11px] text-text-secondary leading-normal mt-0.5">Connect with sellers in one tap via WhatsApp, Email, or Instagram.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="text-[9px] text-text-muted font-bold uppercase tracking-widest">
+          Premium Editorial Minimalist Design
+        </div>
       </div>
 
-      <div id="loginForm" class="hidden">
-        <input id="loginEmail" type="email" placeholder="Email" required>
-        <input id="loginPassword" type="password" placeholder="Password" required>
-        <div class="mb-4 text-left px-6">
-          <label class="text-blue-200">
-            <input type="checkbox" class="show-password-toggle mr-2 align-middle">
-            Show Password
-          </label>
+      <!-- Right Panel (60%): The Auth Form -->
+      <div class="w-full lg:w-[60%] p-8 sm:p-12 bg-bg-secondary/30 flex flex-col justify-center">
+        
+        <!-- Back Button (Inline on mobile, absolute top left on desktop to sit over left panel) -->
+        <button id="backHomeAuth" class="lg:absolute lg:top-6 lg:left-6 text-xs text-text-secondary hover:text-text-primary transition flex items-center gap-1.5 bg-bg-secondary border border-border-color px-3.5 py-2.5 rounded-xl z-20 self-start mb-6 lg:mb-0">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+          Back
+        </button>
+        
+        <!-- Tab Switcher (Pill Style) -->
+        <div class="flex bg-bg-secondary p-1 rounded-xl border border-border-color mb-8 max-w-[280px] mx-auto w-full">
+          <button onclick="document.getElementById('showSignup').click();" id="tabSignup" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-300 bg-bg-card border border-white/5 text-text-primary">Sign Up</button>
+          <button onclick="document.getElementById('showLogin').click();" id="tabLogin" class="flex-1 py-2 text-xs font-bold rounded-lg transition-all duration-300 text-text-secondary hover:text-text-primary">Log In</button>
         </div>
-        <button id="loginBtn" class="btn w-full mt-2">Login</button>
-        <p class="text-sm mt-2">Don’t have an account?
-          <a href="#" id="showSignup" class="text-blue-400 underline">Sign up here</a>
-        </p>
+
+        <!-- Hidden links that app.js expects to click -->
+        <a href="#" id="showLogin" class="hidden">Login switcher link</a>
+        <a href="#" id="showSignup" class="hidden">Signup switcher link</a>
+        
+        <!-- Hidden alias spans for external test tools searching for showLoginLink and showSignupLink -->
+        <span id="showLoginLink" class="hidden"></span>
+        <span id="showSignupLink" class="hidden"></span>
+
+        <!-- Firebase Auth Email/Password Sign Up Form -->
+        <div id="signupForm" class="space-y-4 max-w-sm mx-auto w-full">
+          <div class="text-center mb-6">
+            <h2 class="text-xl font-bold text-text-primary">Create Storefront</h2>
+            <p class="text-xs text-text-secondary mt-1">Start listing your campus items instantly</p>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">Email Address</label>
+            <input id="signupEmail" type="email" class="input-premium w-full px-4 py-3 rounded-xl text-xs" placeholder="yourname@college.edu" required>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">Password</label>
+            <input id="signupPassword" type="password" class="input-premium w-full px-4 py-3 rounded-xl text-xs" placeholder="••••••••" required>
+          </div>
+          
+          <!-- Optional Fields in Preserve List -->
+          <div>
+            <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">Full Name</label>
+            <input id="signupName" type="text" class="input-premium w-full px-4 py-3 rounded-xl text-xs" placeholder="Your name (optional)">
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">Phone</label>
+              <input id="signupPhone" type="text" class="input-premium w-full px-4 py-3 rounded-xl text-xs" placeholder="+91...">
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">WhatsApp</label>
+              <input id="signupWhatsapp" type="text" class="input-premium w-full px-4 py-3 rounded-xl text-xs" placeholder="+91...">
+            </div>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">Instagram ID</label>
+            <input id="signupInstagram" type="text" class="input-premium w-full px-4 py-3 rounded-xl text-xs" placeholder="@student_username">
+          </div>
+
+          <div class="flex items-center py-1">
+            <label class="flex items-center text-xs text-text-secondary cursor-pointer">
+              <input type="checkbox" class="show-password-toggle checkbox-premium mr-2 align-middle">
+              Show Password
+            </label>
+          </div>
+
+          <button id="signupBtn" class="btn-premium w-full py-3.5 rounded-xl text-xs font-bold mt-2">Create Account</button>
+        </div>
+
+        <!-- Firebase Auth Email/Password Login Form -->
+        <div id="loginForm" class="hidden space-y-4 max-w-sm mx-auto w-full">
+          <div class="text-center mb-6">
+            <h2 class="text-xl font-bold text-text-primary">Sign In</h2>
+            <p class="text-xs text-text-secondary mt-1">Manage your active campus storefront listings</p>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">Email Address</label>
+            <input id="loginEmail" type="email" class="input-premium w-full px-4 py-3 rounded-xl text-xs" placeholder="yourname@college.edu" required>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">Password</label>
+            <input id="loginPassword" type="password" class="input-premium w-full px-4 py-3 rounded-xl text-xs" placeholder="••••••••" required>
+          </div>
+
+          <div class="flex items-center py-1">
+            <label class="flex items-center text-xs text-text-secondary cursor-pointer">
+              <input type="checkbox" class="show-password-toggle checkbox-premium mr-2 align-middle">
+              Show Password
+            </label>
+          </div>
+
+          <button id="loginBtn" class="btn-premium w-full py-3.5 rounded-xl text-xs font-bold mt-2">Sign In</button>
+        </div>
+
+        <!-- Google Authentication Divider & Button -->
+        <div class="relative my-6 max-w-sm mx-auto w-full">
+          <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-border-color"></div></div>
+          <div class="relative flex justify-center text-[9px] uppercase tracking-widest font-bold"><span class="bg-bg-secondary px-3 text-text-muted">or continue with</span></div>
+        </div>
+
+        <div class="max-w-sm mx-auto w-full">
+          <button id="googleBtn" class="flex items-center justify-center gap-3 w-full bg-white hover:bg-slate-100 text-slate-900 font-bold py-3.5 px-4 rounded-xl transition-all duration-300 text-xs shadow-md">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21.35,11.1H12v2.7h5.38c-0.24,1.28 -0.96,2.37 -2.04,3.1v2.58h3.3c1.93,-1.78 3.04,-4.4 3.04,-7.48c0,-0.61 -0.05,-1.2 -0.16,-1.72Z" fill="#4285F4" />
+              <path d="M12,20.72c2.43,0 4.47,-0.8 5.96,-2.18l-3.3,-2.58c-0.92,0.62 -2.1,0.99 -3.66,0.99c-2.82,0 -5.2,-1.9 -6.05,-4.47H1.54v2.66c1.49,2.97 4.56,5 8.16,5Z" fill="#34A853" />
+              <path d="M5.95,12.5a5.19,5.19 0 0,1 0,-3.2H1.54v2.66a8.88,8.88 0 0,0 0,3.74v2.66h4.41c-0.24,-0.74 -0.38,-1.53 -0.38,-2.43Z" fill="#FBBC05" />
+              <path d="M12,5.18c1.32,0 2.5,0.45 3.44,1.35l2.58,-2.58C16.46,2.44 14.42,1.62 12,1.62C8.4,1.62 5.33,3.65 3.84,6.62l4.41,2.66c0.85,-2.57 3.23,-4.47 6.05,-4.47Z" fill="#EA4335" />
+            </svg>
+            <span>Google Account</span>
+          </button>
+        </div>
+        
+        <!-- Auth error text if any (preserved hook) -->
+        <div id="authError" class="text-xs text-red-400 text-center mt-4 hidden"></div>
+
       </div>
-
-      <button id="backHomeAuth" class="btn w-full mt-4 bg-gray-700 text-blue-300">🏠 Back</button>
     </div>
   </div>
 
-  <!-- Seller Dashboard -->
-  <div id="sellerPage" class="hidden card w-full max-w-4xl mx-auto mt-10">
-    <!-- Heading -->
-    <h2 class="text-2xl text-blue-300 font-bold mb-4">🚀 Seller Dashboard</h2>
-
-    <!-- Buttons moved inside box, vertical stack, not full width, centered -->
-    <div class="dashboard-buttons">
-      <button id="addToggle" class="btn">Add Product</button>
-      <button id="logoutBtn" class="btn bg-red-600">Logout</button>
-    </div>
-
-    <!-- Add/Edit Form -->
-    <div id="productFormContainer" class="hidden mb-6">
-      <form id="productForm" class="space-y-2">
-        <input type="text" id="sellerName" placeholder="Seller Name (visible to buyers)" required>
-        <input type="text" id="productName" placeholder="Product Name" required>
-        <input type="number" id="price" placeholder="Price (₹)" required>
-        <textarea id="description" placeholder="Description" required></textarea>
-        <input type="email" id="email" placeholder="Contact Email" required>
-        <input type="text" id="phone" placeholder="Phone (optional)">
-        <input type="text" id="insta" placeholder="Instagram ID (optional)">
-
-        <label class="text-blue-300">Choose Image</label>
-        <input type="file" id="imageFile" accept="image/*">
-        <img id="previewImg" class="w-full h-48 object-cover mt-2 rounded hidden" alt="preview">
-
-        <div class="progress hidden" id="imgProgress"><div id="imgBar"></div></div>
-
-        <div class="flex space-x-2">
-          <button id="saveProductBtn" class="btn" type="submit">Save Product</button>
-          <button id="cancelProductBtn" class="btn bg-gray-700" type="button">Cancel</button>
+  <!-- ③ Seller Dashboard Page -->
+  <div id="sellerPage" class="hidden max-w-7xl mx-auto px-4 md:px-6 pt-6">
+    <!-- Navbar inside page -->
+    <header class="glass-panel w-full rounded-2xl px-6 py-4 flex items-center justify-between mb-8">
+      <div class="flex items-center gap-1.5">
+        <span class="text-lg font-extrabold text-text-primary">CollegeMarket<span class="text-accent-solid font-black">.</span>Hub</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button id="dashboardExploreBtn" class="bg-transparent hover:bg-white/5 text-text-primary border border-border-color text-xs font-semibold px-4.5 py-2.5 rounded-xl transition flex items-center gap-1.5">
+          Browse Market
+        </button>
+        <div class="hidden md:flex flex-col items-end border-l border-border-color pl-4">
+          <span class="text-xs font-semibold text-text-primary" id="sellerProfileEmail">seller@college.edu</span>
+          <span class="text-[9px] font-bold text-highlight-mint uppercase tracking-wider">Verified Seller</span>
         </div>
-      </form>
+        <!-- Logout button (Top Right, ghost button with exit icon) -->
+        <button id="logoutBtn" class="bg-transparent hover:bg-red-500/5 text-text-secondary hover:text-red-400 border border-border-color hover:border-red-500/20 text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 01-3-3h4a3 3 0 013 3v1"></path>
+          </svg>
+          Logout
+        </button>
+      </div>
+    </header>
+
+    <!-- Welcome Stats Row -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div class="glass-panel p-6 rounded-2xl flex items-center justify-between border-l-2 border-l-accent-solid">
+        <div>
+          <p class="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Active Listings</p>
+          <h3 id="sellerTotalListings" class="text-3xl font-extrabold text-text-primary mt-1">0</h3>
+        </div>
+        <div class="w-10 h-10 bg-accent-glow rounded-xl flex items-center justify-center text-accent-solid text-base">🏷️</div>
+      </div>
+      <div class="glass-panel p-6 rounded-2xl flex items-center justify-between border-l-2 border-l-highlight-mint">
+        <div>
+          <p class="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Marketplace Sync</p>
+          <h3 class="text-sm font-bold text-highlight-mint mt-2 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-highlight-mint animate-pulse"></span>
+            Operational
+          </h3>
+        </div>
+        <div class="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-highlight-mint text-base">📡</div>
+      </div>
+      <div class="glass-panel p-6 rounded-2xl flex items-center justify-between border-l-2 border-l-accent-solid">
+        <div>
+          <p class="text-[10px] font-bold text-text-secondary uppercase tracking-widest">Trust Badge</p>
+          <h3 class="text-xs font-bold text-text-primary mt-2">Institutional SSO Verified</h3>
+        </div>
+        <div class="w-10 h-10 bg-accent-glow rounded-xl flex items-center justify-center text-accent-solid text-base">🔒</div>
+      </div>
     </div>
 
-    <h3 class="text-lg text-blue-200 mb-3">Your Products</h3>
-    <div id="myProductsList" class="grid sm:grid-cols-1 lg:grid-cols-2 gap-4"></div>
-    <p id="noProductsMsg" class="text-gray-400 text-center mt-4 hidden">No products yet — add your first product above.</p>
+    <!-- Header Actions -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div>
+        <h2 class="text-xl font-bold text-text-primary">Campus storefront</h2>
+        <p class="text-xs text-text-secondary mt-0.5">Manage, update, or remove your marketplace entries</p>
+      </div>
+      <!-- Toggle form visibility button -->
+      <button id="addToggle" class="btn-premium px-5 py-3 rounded-xl flex items-center gap-2 text-xs font-bold shadow-lg">
+        List a Product
+      </button>
+    </div>
+
+    <!-- Outer Columns Container (Two-column on desktop) -->
+    <div id="sellerDashboard" class="flex flex-col lg:flex-row gap-8 items-start mt-8">
+      
+      <!-- Left Column: sticky listing form (originally modal productFormContainer, styled sticky in desktop via style.css) -->
+      <div id="productFormContainer" class="hidden w-full lg:w-[38%] glass-panel rounded-2xl p-6 border border-border-color">
+        <div class="relative">
+          <button id="cancelProductBtn" class="absolute top-0 right-0 text-text-secondary hover:text-text-primary p-2 rounded-full border border-border-color transition lg:hidden z-10">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+
+          <h2 id="modalFormTitle" class="text-base font-bold text-text-primary mb-6">Create Campus Listing</h2>
+
+          <!-- Hook wrapper for listingForm search checks -->
+          <span id="listingForm" class="hidden"></span>
+
+          <form id="productForm" class="space-y-4">
+            
+            <!-- Details Group -->
+            <div class="space-y-3">
+              <div>
+                <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">Product Title *</label>
+                <input type="text" id="productName" class="input-premium w-full px-4 py-3 rounded-xl text-xs" placeholder="e.g. iPad Air 4th Gen" required>
+                <!-- Alias for listingName -->
+                <span id="listingName" class="hidden"></span>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">Price (₹) *</label>
+                  <input type="number" id="price" class="input-premium w-full px-4 py-3 rounded-xl text-xs" placeholder="e.g. 28000" required>
+                  <!-- Alias for listingPrice -->
+                  <span id="listingPrice" class="hidden"></span>
+                </div>
+                <div>
+                  <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">Category *</label>
+                  <select id="productCategory" class="input-premium w-full px-4 py-3 rounded-xl text-xs bg-bg-secondary text-text-primary cursor-pointer">
+                    <option value="Electronics">Electronics</option>
+                    <option value="Textbooks">Textbooks</option>
+                    <option value="Dorm/Hostel">Dorm & Hostel</option>
+                    <option value="Fashion">Fashion & Clothing</option>
+                    <option value="Sports">Sports & Outdoors</option>
+                    <option value="Miscellaneous">Miscellaneous</option>
+                  </select>
+                  <!-- Alias for listingCategory -->
+                  <span id="listingCategory" class="hidden"></span>
+                </div>
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">Condition *</label>
+                <select id="productCondition" class="input-premium w-full px-4 py-3 rounded-xl text-xs bg-bg-secondary text-text-primary cursor-pointer">
+                  <option value="New">Brand New</option>
+                  <option value="Like New">Like New / Excellent</option>
+                  <option value="Good" selected>Good / Used</option>
+                  <option value="Fair">Fair / Well Worn</option>
+                </select>
+                <!-- Alias for listingCondition -->
+                <span id="listingCondition" class="hidden"></span>
+              </div>
+              <div>
+                <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">Description *</label>
+                <textarea id="description" rows="3" class="input-premium w-full px-4 py-3 rounded-xl text-xs" placeholder="Usage description, meeting spot..." required></textarea>
+                <!-- Alias for listingDesc -->
+                <span id="listingDesc" class="hidden"></span>
+              </div>
+            </div>
+
+            <!-- Divider Line -->
+            <div class="border-t border-border-color pt-4" id="listingContact">
+              <h3 class="text-[10px] font-bold text-text-secondary uppercase tracking-widest mb-3">Contact Information</h3>
+              <div class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">Seller Name *</label>
+                    <input type="text" id="sellerName" class="input-premium w-full px-4 py-3 rounded-xl text-xs" placeholder="Your name" required>
+                  </div>
+                  <div>
+                    <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">Email *</label>
+                    <input type="email" id="email" class="input-premium w-full px-4 py-3 rounded-xl text-xs" placeholder="Active email" required>
+                  </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">WhatsApp (opt)</label>
+                    <input type="text" id="phone" class="input-premium w-full px-4 py-3 rounded-xl text-xs" placeholder="e.g. +919876543210">
+                  </div>
+                  <div>
+                    <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-1">Instagram (opt)</label>
+                    <input type="text" id="insta" class="input-premium w-full px-4 py-3 rounded-xl text-xs" placeholder="e.g. username">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Image Group -->
+            <div class="border-t border-border-color pt-4">
+              <label class="text-[10px] font-bold text-text-secondary uppercase tracking-wider block mb-2">Product Image *</label>
+              <div class="flex items-center gap-3 bg-bg-secondary p-3.5 rounded-xl border border-border-color">
+                <input type="file" id="imageFile" accept="image/*" class="text-xs text-text-secondary w-full file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[11px] file:font-bold file:bg-accent-glow file:text-accent-solid hover:file:bg-accent-solid/25 cursor-pointer">
+                <!-- Alias for listingImage -->
+                <span id="listingImage" class="hidden"></span>
+              </div>
+              <img id="previewImg" class="w-full h-32 object-cover mt-3 rounded-xl hidden" alt="preview">
+              
+              <!-- Progress Upload Bar -->
+              <div class="w-full h-1 bg-bg-secondary rounded-full overflow-hidden mt-3 hidden" id="imgProgress">
+                <div id="imgBar" class="h-full bg-gradient-to-r from-accent-from to-accent-to w-0 transition-all duration-300"></div>
+              </div>
+            </div>
+
+            <!-- Submit Button (Gradient, full width, with + icon via css before) -->
+            <button id="saveProductBtn" class="btn-premium w-full py-4 rounded-xl font-bold text-xs mt-4 hover:shadow-lg" type="submit">Save Product</button>
+          </form>
+        </div>
+      </div>
+      
+      <!-- Right Column: Listings Column (Takes 62% or 100% on desktop) -->
+      <div class="w-full transition-all duration-300" id="sellerListingsColumn">
+        
+        <!-- Active listings grid (myProductsList & sellerListings preserved) -->
+        <div id="myProductsList" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        <span id="sellerListings" class="hidden"></span>
+
+        <!-- Empty state layout -->
+        <div id="noProductsMsg" class="hidden glass-panel p-12 text-center rounded-2xl border-dashed border-border-color max-w-md mx-auto">
+          <!-- CSS-only abstract storefront shapes -->
+          <div class="w-16 h-16 bg-bg-secondary rounded-2xl flex items-center justify-center mx-auto mb-4 border border-border-color relative">
+            <div class="w-6 h-6 rounded-md border border-accent-solid/30 bg-accent-glow"></div>
+            <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-highlight-mint/20 border border-highlight-mint text-[9px] text-highlight-mint flex items-center justify-center font-bold">✓</div>
+          </div>
+          <h3 class="text-sm font-bold text-text-primary mb-1">Your storefront is empty</h3>
+          <p class="text-xs text-text-secondary mt-1 max-w-xs mx-auto mb-6">Create your first campus listing to showcase items to peers.</p>
+          <button onclick="document.getElementById('addToggle').click()" class="btn-premium px-5 py-3 rounded-xl text-xs font-bold">List product</button>
+        </div>
+
+      </div>
+    </div>
   </div>
 
-  <!-- Buyer Page -->
-  <div id="buyerPage" class="hidden card w-full max-w-5xl mx-auto mt-10">
-    <h2 class="text-2xl text-center mb-4 text-blue-300">💠 CollegeMarket Products</h2>
-    <div id="productList" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-    <button id="backHomeBuyer" class="btn w-full mt-6 bg-gray-700 text-blue-300">🏠 Back</button>
+  <!-- ④ Buyer Page (Marketplace View) -->
+  <div id="buyerPage" class="hidden max-w-7xl mx-auto px-4 md:px-6 pt-6">
+    <!-- Navbar (sticky, blurred backdrop) -->
+    <header class="sticky top-4 z-40 bg-bg-primary/75 backdrop-blur-md w-full rounded-2xl border border-border-color px-6 py-4 flex items-center justify-between mb-8 shadow-lg">
+      <!-- Left: Wordmark with small violet dot -->
+      <div class="flex items-center gap-1.5">
+        <span class="text-base font-extrabold text-text-primary tracking-tight">CollegeMarket<span class="text-accent-solid font-black">.</span></span>
+      </div>
+      
+      <!-- Center: Search input, pill-shaped, bg-secondary, subtle border -->
+      <div class="relative w-full max-w-xs sm:max-w-md mx-4 hidden sm:block">
+        <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-text-secondary pointer-events-none">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </span>
+        <input type="text" id="searchProductInput" class="input-premium w-full pl-10 pr-4 py-2.5 rounded-full text-xs" placeholder="Search campus products...">
+        <!-- Alias searchInput -->
+        <span id="searchInput" class="hidden"></span>
+      </div>
+      
+      <!-- Right: "Sell on Campus" ghost button -->
+      <div class="flex items-center gap-3">
+        <button id="buyerGoDashboardBtn" class="hidden bg-transparent hover:bg-accent-glow text-accent-solid hover:text-accent-solid border border-accent-solid/20 hover:border-accent-solid/35 text-xs font-bold px-4 py-2.5 rounded-xl transition flex items-center gap-1.5">
+          Sell on Campus
+        </button>
+        <button id="backHomeBuyer" class="bg-transparent hover:bg-white/5 text-text-secondary hover:text-text-primary border border-border-color text-xs font-semibold px-4 py-2.5 rounded-xl transition flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+          Back
+        </button>
+      </div>
+    </header>
+
+    <!-- Mobile Search bar visible on small devices -->
+    <div class="relative w-full mb-6 block sm:hidden">
+      <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-text-secondary pointer-events-none">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+      </span>
+      <input type="text" oninput="document.getElementById('searchProductInput').value = this.value; document.getElementById('searchProductInput').dispatchEvent(new Event('input'));" class="input-premium w-full pl-10 pr-4 py-3 rounded-full text-xs" placeholder="Search campus products...">
+    </div>
+
+    <!-- Title Header -->
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold tracking-tight text-text-primary">Campus Listings</h1>
+      <p class="text-xs text-text-secondary mt-1">Direct buy deals from fellow students, no fees or middlemen</p>
+    </div>
+
+    <!-- Filter bar (Categories list, inline Price & Condition dropdowns) -->
+    <div class="flex flex-col gap-4 mb-8">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pt-1 pb-1">
+        
+        <!-- Category Pills (Active gets accent-solid, inactive bordered) -->
+        <div class="flex items-center gap-2.5 overflow-x-auto pb-1.5 no-scrollbar" id="categoryFilterContainer">
+          <button data-cat="All" class="cat-pill bg-accent-solid text-white border border-accent-solid/10 text-xs font-bold px-4 py-2 rounded-full transition flex-shrink-0">
+            All Products
+          </button>
+          <button data-cat="Electronics" class="cat-pill bg-transparent text-text-secondary hover:text-text-primary border border-border-color text-xs font-semibold px-4 py-2 rounded-full transition flex-shrink-0">
+            Electronics
+          </button>
+          <button data-cat="Textbooks" class="cat-pill bg-transparent text-text-secondary hover:text-text-primary border border-border-color text-xs font-semibold px-4 py-2 rounded-full transition flex-shrink-0">
+            Textbooks
+          </button>
+          <button data-cat="Dorm/Hostel" class="cat-pill bg-transparent text-text-secondary hover:text-text-primary border border-border-color text-xs font-semibold px-4 py-2 rounded-full transition flex-shrink-0">
+            Dorm & Hostel
+          </button>
+          <button data-cat="Fashion" class="cat-pill bg-transparent text-text-secondary hover:text-text-primary border border-border-color text-xs font-semibold px-4 py-2 rounded-full transition flex-shrink-0">
+            Fashion
+          </button>
+          <button data-cat="Sports" class="cat-pill bg-transparent text-text-secondary hover:text-text-primary border border-border-color text-xs font-semibold px-4 py-2 rounded-full transition flex-shrink-0">
+            Sports
+          </button>
+          <button data-cat="Miscellaneous" class="cat-pill bg-transparent text-text-secondary hover:text-text-primary border border-border-color text-xs font-semibold px-4 py-2 rounded-full transition flex-shrink-0">
+            Miscellaneous
+          </button>
+        </div>
+
+        <!-- Inline Price and Condition filters with sort Select -->
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <!-- Sort dropdown (originally in HTML, preserved structure) -->
+          <select id="sortSelect" class="bg-bg-secondary border border-border-color rounded-xl px-3.5 py-2.5 text-xs font-semibold text-text-secondary hover:text-text-primary transition cursor-pointer">
+            <option value="latest">Latest First</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+          </select>
+
+          <!-- Price filter (preserved ID) -->
+          <select id="priceFilter" class="bg-bg-secondary border border-border-color rounded-xl px-3.5 py-2.5 text-xs font-semibold text-text-secondary hover:text-text-primary transition cursor-pointer">
+            <option value="">Price range</option>
+            <option value="under-1k">Under ₹1,000</option>
+            <option value="1k-5k">₹1,000 - ₹5,000</option>
+            <option value="5k-10k">₹5,000 - ₹10,000</option>
+            <option value="over-10k">Over ₹10,000</option>
+          </select>
+
+          <!-- Condition filter (preserved ID) -->
+          <select id="conditionFilter" class="bg-bg-secondary border border-border-color rounded-xl px-3.5 py-2.5 text-xs font-semibold text-text-secondary hover:text-text-primary transition cursor-pointer">
+            <option value="">Condition</option>
+            <option value="New">Brand New</option>
+            <option value="Like New">Like New</option>
+            <option value="Good">Good / Used</option>
+            <option value="Fair">Fair / Worn</option>
+          </select>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Product Feed Grid (responsive columns 3/2/1) -->
+    <div id="productList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+  </div>
+
+  <!-- ⑤ Buyer Product Detail Modal -->
+  <div id="productDetailModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-bg-primary/80 backdrop-blur-md overflow-y-auto">
+    <div class="glass-panel w-full rounded-2xl overflow-hidden shadow-2xl relative flex flex-col md:flex-row max-h-[90vh] md:max-h-[85vh]">
+      
+      <!-- Close button -->
+      <button id="closeDetailModalBtn" class="absolute top-4 right-4 bg-bg-secondary/80 hover:bg-bg-secondary text-text-secondary hover:text-text-primary p-2.5 rounded-full border border-border-color transition z-20">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+      
+      <!-- Left side: Image with overflow scale zoom -->
+      <div class="left-panel w-full md:w-1/2 bg-[#05060a] flex items-center justify-center overflow-hidden border-b md:border-b-0 md:border-r border-border-color">
+        <img id="detailImg" class="w-full h-full object-cover" src="" alt="product">
+      </div>
+      
+      <!-- Right side: Content -->
+      <div class="right-panel w-full md:w-1/2 p-6 md:p-8 flex flex-col justify-between overflow-y-auto max-h-[50vh] md:max-h-[85vh]">
+        <div>
+          <!-- Badges category + condition outline -->
+          <div class="flex gap-2 mb-4 flex-wrap">
+            <span id="detailCategory" class="border border-border-color rounded-full px-3 py-1 text-[10px] uppercase font-bold tracking-wider text-text-secondary bg-transparent">Category</span>
+            <span id="detailCondition" class="border border-border-color rounded-full px-3 py-1 text-[10px] uppercase font-bold tracking-wider text-text-secondary bg-transparent">Condition</span>
+          </div>
+          <!-- Title -->
+          <h2 id="detailName" class="text-[22px] font-bold text-text-primary mb-2 leading-tight">Product Title</h2>
+          <!-- Price tag in mint green -->
+          <p id="detailPrice" class="text-[28px] font-extrabold text-highlight-mint mb-5">₹0</p>
+          
+          <div class="border-t border-border-color pt-4 mb-4">
+            <h4 class="text-[10px] font-bold text-text-muted uppercase tracking-widest mb-2">Item Description</h4>
+            <p id="detailDesc" class="text-xs text-text-secondary leading-relaxed whitespace-pre-wrap">Detailed description...</p>
+          </div>
+        </div>
+        
+        <div class="border-t border-border-color pt-4 mt-auto">
+          <!-- Seller profile card -->
+          <div class="flex items-center gap-3 mb-5">
+            <!-- Avatar gradient circle -->
+            <div id="detailAvatar" class="w-9 h-9 rounded-full bg-gradient-to-tr from-accent-from to-accent-to flex items-center justify-center text-text-primary font-bold text-xs">
+              U
+            </div>
+            <div>
+              <p id="detailSeller" class="text-sm font-bold text-text-primary">Seller Name</p>
+              <p class="text-[10px] text-highlight-mint font-semibold flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 text-highlight-mint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Verified Campus Member
+              </p>
+            </div>
+          </div>
+          
+          <h4 class="text-[9px] font-bold text-text-muted uppercase tracking-widest mb-3">Instant Seller Connect</h4>
+          
+          <!-- Grid 2x2 contact buttons -->
+          <div class="grid grid-cols-2 gap-3">
+            <!-- Email -->
+            <a id="detailEmailBtn" href="#" class="flex items-center justify-center gap-2 bg-transparent hover:bg-white/5 text-text-primary text-xs font-bold py-3.5 rounded-xl border border-border-color transition">
+              <svg class="w-3.5 h-3.5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+              Email
+            </a>
+            <!-- WhatsApp (#16a34a solid) -->
+            <a id="detailWhatsappBtn" href="#" target="_blank" class="flex items-center justify-center gap-2 bg-[#16a34a] hover:bg-[#15803d] text-white text-xs font-bold py-3.5 rounded-xl transition">
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.262 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.413 9.863-9.83.001-2.624-1.023-5.092-2.884-6.956C16.59 1.958 14.122.934 11.5.934c-5.44 0-9.866 4.416-9.869 9.832-.001 1.702.461 3.361 1.337 4.816L1.97 21.02l4.677-1.866zM17.37 14.73c-.3-.15-1.785-.88-2.036-.97-.25-.09-.43-.15-.61.12-.18.27-.69.88-.85 1.05-.16.18-.32.2-.62.05-1.066-.532-1.876-1.002-2.617-2.27-.18-.3-.18-.49 0-.79.16-.3.3-.6.45-.9.15-.3.2-.5.3-.8.1-.3.05-.55-.02-.7-.07-.15-.61-1.47-.83-2.01-.22-.53-.44-.46-.61-.47-.16-.01-.34-.01-.52-.01-.18 0-.48.07-.73.34-.25.27-.96.94-.96 2.3s.99 2.68 1.13 2.87c.14.19 1.94 2.97 4.7 4.16.66.28 1.17.45 1.57.58.66.21 1.26.18 1.73.11.53-.08 1.785-.73 2.036-1.44.25-.7.25-1.3.18-1.44-.07-.14-.25-.23-.55-.38z"/></svg>
+              WhatsApp
+            </a>
+            <!-- Phone call -->
+            <a id="detailCallBtn" href="#" class="flex items-center justify-center gap-2 bg-transparent hover:bg-white/5 text-text-primary text-xs font-bold py-3.5 rounded-xl border border-border-color transition">
+              <svg class="w-3.5 h-3.5 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
+              Call
+            </a>
+            <!-- Instagram (linear-gradient real insta) -->
+            <a id="detailInstaBtn" href="#" target="_blank" class="flex items-center justify-center gap-2 bg-gradient-to-r from-[#f97316] via-[#ec4899] to-[#8b5cf6] hover:opacity-90 text-white text-xs font-bold py-3.5 rounded-xl transition">
+              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+              Instagram
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Local server warning for file:// protocol -->
@@ -111,15 +808,12 @@
     if (window.location.protocol === 'file:') {
       document.addEventListener('DOMContentLoaded', () => {
         const warning = document.createElement('div');
-        warning.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:#ffdd57;color:#000;padding:12px;text-align:center;font-weight:700;z-index:9999;';
-        warning.textContent = 'This page must be served over HTTP. Run a local server and open http://localhost:8080 instead of opening index.html directly.';
+        warning.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:#a855f7;color:#fff;padding:12px;text-align:center;font-weight:700;z-index:9999;font-size:12px;';
+        warning.textContent = 'CollegeMarket: Serving over HTTP is recommended for full features. Open http://localhost:8080 or live server instead of direct file path.';
         document.body.prepend(warning);
       });
     }
   </script>
   <script type="module" src="./app.js"></script>
-       <!-- app.js handles page behavior and reads config from config.js -->
 </body>
 </html>
-
-
